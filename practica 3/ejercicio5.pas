@@ -4,7 +4,6 @@ información se ingresa ordenada por marca. Se pide calcular e informar:
 a. El precio promedio por marca.
 b. Marca y modelo del auto más caro. }
 
-
 Program ejercicio5;
 
 Type 
