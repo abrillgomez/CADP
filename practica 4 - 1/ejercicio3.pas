@@ -102,5 +102,6 @@ Begin
 End;
 
 { programa principal }
+var
 Begin
-End;
+End.
