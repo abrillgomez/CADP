@@ -10,7 +10,7 @@ Var
 
 Begin
   write('Ingrese un numero real:');
-  read(num);
+  readln(num);
   If (num < 0) Then
     write(-num:0:2)
   Else

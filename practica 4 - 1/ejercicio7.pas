@@ -26,7 +26,7 @@ Begin
       v[i] := 0;
     End;
 
-  read(num);
+  readln(num);
 
   While (num <> -1) Do
     Begin
@@ -38,7 +38,7 @@ Begin
           num := num Div 10;
           // Recorto el número para la próxima vuelta (Ej: el 63 pasa a ser 6)
         End;
-      read(num);
+      readln(num);
     End;
 
 End;

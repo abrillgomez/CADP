@@ -22,12 +22,12 @@ Procedure cargarVector(Var v:vdatos; Var dimL : integer);
 Var 
   num: real;
 Begin
-  readln(num);
+  readlnln(num);
   While ((num <> 0) And (dimL< cant_datos)) Do
     Begin
       dimL := dimL+1;
       v[dimL] := num;
-      readln(num);
+      readlnln(num);
     End;
 End;
 
@@ -54,7 +54,7 @@ Begin
   suma := 0;
   cargarVector(datos, dim);
   writeln('Ingrese un valor a sumar');
-  readln(num);
+  readlnln(num);
   modificarVectorySumar(datos, dim, num, suma);
   writeln('La suma de los valores es: ', suma);
   writeln('Se procesaron: ',dim, ' números')

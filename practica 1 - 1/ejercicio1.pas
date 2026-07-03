@@ -9,9 +9,9 @@ Var
 Begin
 
   write('Ingrese el primer numero:');
-  read(num1);
+  readln(num1);
   write('Ingrese el segundo numero:');
-  read(num2);
+  readln(num2);
   If (num1 > num2) Then
     write('El numero mayor es: ', num1)
   Else If (num2 > num1) Then

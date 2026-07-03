@@ -6,7 +6,6 @@ universidad y la lectura finaliza al leer un centro con 0 investigadores, que no
 ● Universidad con mayor cantidad de investigadores en sus centros.
 ● Los dos centros con menor cantidad de becarios. }
 
-
 Program ejercicio7;
 
 Type 

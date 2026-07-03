@@ -18,17 +18,17 @@ Type
 Procedure leerAlumno(Var alu:alumno);
 Begin
   writeln('Ingrese el dni del alumno');
-  read(alu.dni);
+  readln(alu.dni);
   If (alu.dni <> -1 ) Then
     Begin
       writeln('Ingrese el numero de inscripcion del alumno');
-      read(alu.numInscripcion);
+      readln(alu.numInscripcion);
       writeln('Ingrese el apellido del alumno');
-      read(alu.apellido);
+      readln(alu.apellido);
       writeln('Ingrese el nombre del alumno');
-      read(alu.nombre);
+      readln(alu.nombre);
       writeln('Ingrese el anio de nacimiento del alumno');
-      read(alu.anioNac);
+      readln(alu.anioNac);
     End;
 End;
 

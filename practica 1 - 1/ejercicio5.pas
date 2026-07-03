@@ -26,7 +26,7 @@ Begin
   cantAlumSup := 0;
   cantAlumDest := 0;
   write('Ingrese el legajo del alumno: ');
-  read(legajo);
+  readln(legajo);
   write('Ingrese el promedio del alumno: ');
-  read(promedio);
+  readln(promedio);
 End.

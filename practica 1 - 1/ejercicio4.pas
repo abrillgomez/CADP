@@ -10,15 +10,15 @@ Var
 
 Begin
   write('Ingrese un numero real:');
-  read(num1);
+  readln(num1);
   aux := num1 * 2;
   cant := 1;
   write('Ingrese otro numero real:');
-  read(num2);
+  readln(num2);
 
   While (num2 <> aux) And (cant<10) Do
     Begin
-      read(num2);
+      readln(num2);
       cant := cant + 1;
     End;
 

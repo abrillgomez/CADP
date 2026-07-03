@@ -14,13 +14,13 @@ Type
 Procedure leer(Var alu : alumno);
 Begin
   writeln('Ingrese el codigo del alumno');
-  readln(alu.codigo);
+  readlnln(alu.codigo);
   If (alu.codigo <> 0) Then
     Begin
       writeln('Ingrese el nombre del alumno');
-      readln(alu.nombre);
+      readlnln(alu.nombre);
       writeln('Ingrese el promedio del alumno');
-      readln(alu.promedio);
+      readlnln(alu.promedio);
     End;
 End;
 

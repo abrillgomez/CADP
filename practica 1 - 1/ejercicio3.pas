@@ -8,11 +8,11 @@ Var
 
 Begin
   write('Ingrese un numero real:');
-  read(num1);
+  readln(num1);
   aux := num1 * 2;
   write('Ingrese otro numero real:');
-  read(num2);
+  readln(num2);
 
   While (num2 <> aux) Do
-    read(num2);
+    readln(num2);
 End.

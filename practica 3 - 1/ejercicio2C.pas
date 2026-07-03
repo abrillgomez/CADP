@@ -19,11 +19,11 @@ Type
 Procedure leerFecha (Var f: fecha);
 Begin
   writeln('Ingrese el dia del casamiento: ');
-  readln(f.dia);
+  readlnln(f.dia);
   writeln('Ingrese el mes del casamiento: ');
-  readln(f.mes);
+  readlnln(f.mes);
   writeln('Ingrese el anio del casamiento: ');
-  readln(f.anio);
+  readlnln(f.anio);
 End;
 
 Var 
