@@ -82,6 +82,7 @@ Begin
 End;
 
 Procedure cargarLista(Var l: lista);
+
 Var 
   e: empresa;
 Begin
@@ -94,95 +95,120 @@ Begin
 End;
 
 // Inciso B
-function tienDosCeros (num: integer): boolean;
-var
-  cont, digito: integer;
-begin 
-  cont:=0;
-  While(num <> 0) do begin
-    digito:=num MOD 10;
-    if(digito=0) then begin
-      cont:=cont+1;
-    end;
-    num:=num DIV 10;
-  end;
-  tienDosCeros := (cont >= 2);
-end;
+Function tienDosCeros (num: integer): boolean;
 
-function cultivaTrigo(v: vectorCultivos; dimL: integer): boolean;
-var
+Var 
+  cont, digito: integer;
+Begin
+  cont := 0;
+  While (num <> 0) Do
+    Begin
+      digito := num Mod 10;
+      If (digito=0) Then
+        Begin
+          cont := cont+1;
+        End;
+      num := num Div 10;
+    End;
+  tienDosCeros := (cont >= 2);
+End;
+
+Function cultivaTrigo(v: vectorCultivos; dimL: integer): boolean;
+
+Var 
   i: integer;
   encontre: boolean;
-begin
-  encontre:=false;
-  i:=1;
+Begin
+  encontre := false;
+  i := 1;
 
-  while ((i <= dimL) and (encontre = false)) do begin
-    if (v[i].tipo = 'trigo') then begin 
-      encontre:=true;
-    end else begin
-      i:=i+1;
-      end;
-  end;
-  cultivaTrigo:=encontre;
-end;
+  While ((i <= dimL) And (encontre = false)) Do
+    Begin
+      If (v[i].tipo = 'trigo') Then
+        Begin
+          encontre := true;
+        End
+      Else
+        Begin
+          i := i+1;
+        End;
+    End;
+  cultivaTrigo := encontre;
+End;
 
 // Inciso B, C y D
-procedure procesarLista (l: lista);
-var 
+Procedure procesarLista (l: lista);
+
+Var 
   soja, total: real;
   i, maxTiempo: integer;
   maxEmpresa: string;
-begin
-  soja:=0;
-  total:=0;
-  maxTiempo:=-1;
-  while (l<>nil) do begin
-    if ((l^.dato.ciudad = 'San Miguel del Monte') and (cultivaTrigo(l^.dato.cultivos, l^.dato.dimL)) and (tienDosCeros(l^.dato.codigo))) then begin
-      writeln(l^.dato.nombre);
-    end;
-    for i:=1 to l^.dato.dimL do begin 
-      total:=total+l^.dato.cultivos[i].cantHect;
-      if (l^.dato.cultivos[i].tipo = 'soja') then begin 
-        soja := soja + l^.dato.cultivos[i].cantHect;
-      end;
-      if ((l^.dato.cultivos[i].tipo ='maiz') and (l^.dato.cultivos[i].cantMeses > maxTiempo)) then begin
-        maxEmpresa:=l^.dato.nombre;
-        maxTiempo:=l^.dato.cultivos[i].cantMeses;
-      end;
-    end;
-    l:=l^.sig;
-  end;
+Begin
+  soja := 0;
+  total := 0;
+  maxTiempo := -1;
+  While (l<>Nil) Do
+    Begin
+      If ((l^.dato.ciudad = 'San Miguel del Monte') And (cultivaTrigo(l^.dato.
+         cultivos, l^.dato.dimL)) And (tienDosCeros(l^.dato.codigo))) Then
+        Begin
+          writeln(l^.dato.nombre);
+        End;
+      For i:=1 To l^.dato.dimL Do
+        Begin
+          total := total+l^.dato.cultivos[i].cantHect;
+          If (l^.dato.cultivos[i].tipo = 'soja') Then
+            Begin
+              soja := soja + l^.dato.cultivos[i].cantHect;
+            End;
+          If ((l^.dato.cultivos[i].tipo ='maiz') And (l^.dato.cultivos[i].
+             cantMeses > maxTiempo)) Then
+            Begin
+              maxEmpresa := l^.dato.nombre;
+              maxTiempo := l^.dato.cultivos[i].cantMeses;
+            End;
+        End;
+      l := l^.sig;
+    End;
   writeln('Hectareas totales de soja: ', soja:0:2);
-  if (total > 0) then begin
-    writeln('Porcentaje que representa: ', (soja*100/total):0:2, '%');
-  end;
-  writeln('La empresa: ', maxEmpresa, ' tarda ', maxTiempo, ' en cultivar maiz');
-end;
+  If (total > 0) Then
+    Begin
+      writeln('Porcentaje que representa: ', (soja*100/total): 0: 2, '%');
+    End;
+  writeln('La empresa: ', maxEmpresa, ' tarda ', maxTiempo, ' en cultivar maiz')
+  ;
+End;
 
 // Inciso E
-procedure incrementarGirasol (l: lista);
-var
+Procedure incrementarGirasol (l: lista);
+
+Var 
   i: integer;
 
-begin 
-  while (l <> nil) do begin
-  if (l^.dato.tipo = false) then begin 
-    for i:=1 to l^.dato.dimL do begin
-      if ((l^.dato.cultivos[i].tipo = 'girasol') and (l^.dato.cultivos[i].cantHect < 5)) then begin 
-      l^.dato.cultivos[i].cantMeses:=l^.dato.cultivos[i].cantMeses+1;
-      end;
-    end;
-  end;
-  l:=l^.sig;
-  end;
-end;
+Begin
+  While (l <> Nil) Do
+    Begin
+      If (l^.dato.tipo = false) Then
+        Begin
+          For i:=1 To l^.dato.dimL Do
+            Begin
+              If ((l^.dato.cultivos[i].tipo = 'girasol') And (l^.dato.cultivos[i
+                 ].cantHect < 5)) Then
+                Begin
+                  l^.dato.cultivos[i].cantMeses := l^.dato.cultivos[i].cantMeses
+                                                   +1;
+                End;
+            End;
+        End;
+      l := l^.sig;
+    End;
+End;
 
 Var 
   l: lista;
 Begin
-  l := nil; 
-  cargarLista(l); 
-  procesarLista(l); 
-  incrementarGirasol(l); 
+  l := Nil;
+  cargarLista(l);
+  procesarLista(l);
+  incrementarGirasol(l);
 End.
