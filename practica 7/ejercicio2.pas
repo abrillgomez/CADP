@@ -111,7 +111,7 @@ Begin
     End;
 End;
 
-// Inciso D
+// Inciso C
 Procedure eliminar (Var l: lista; valor: integer);
 
 Var 
