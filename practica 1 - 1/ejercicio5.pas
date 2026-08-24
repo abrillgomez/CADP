@@ -25,8 +25,23 @@ Begin
   cantAlum := 0;
   cantAlumSup := 0;
   cantAlumDest := 0;
-  write('Ingrese el legajo del alumno: ');
+  writeln('Ingrese el legajo del alumno');
   readln(legajo);
-  write('Ingrese el promedio del alumno: ');
-  readln(promedio);
+  While (legajo <> -1) Do
+    Begin
+      writeln('Ingrese el promedio del alumno');
+      readln(promedio);
+      cantAlum := cantAlum+1;
+      If (promedio > 6.5) Then
+        cantAlumSup := cantAlumSup+1;
+      If (promedio > 8.5) And (legajo < 2500) Then
+        cantAlumDest := cantAlumDest+1;
+      writeln('Ingrese el legajo del alumno');
+      readln(legajo);
+    End;
+  writeln('Cantidad de alumnos leida: ', cantAlum);
+  writeln('Cantidad de alumnos cuyo promedio supera 6.5: ', cantAlumSup);
+  If (cantAlum > 0) Then
+    writeln('Porcentaje de alumnos destacados cuyo legajo es menor a 2500: ', (
+            cantAlumDest*100)/cantAlum: 0: 2);
 End.
