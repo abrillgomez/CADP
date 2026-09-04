@@ -1,157 +1,152 @@
-{ Una empresa de transporte de caudales desea optimizar el servicio que brinda a
-sus clientes. Para ello, cuenta con información sobre todos los viajes realizados 
-durante el mes de marzo. De cada viaje se cuenta con la siguiente información: 
-día del mes (de 1 a 31), monto de dinero transportado y distancia recorrida 
-por el camión (medida en kilómetros).
-a. Realizar un programa que lea y almacene la información de los viajes (a lo sumo
-200). La lectura finaliza cuando se ingresa una distancia recorrida igual a 0 km, 
-que no debe procesarse.
-b. Realizar un módulo que reciba el vector generado en a) e informe:
-  - El monto promedio transportado de los viajes realizados.
-  - La distancia recorrida y el día del mes en que se realizó el viaje que
-  transportó menos dinero.
-  - La cantidad de viajes realizados cada día del mes.
-c. Realizar un módulo que reciba el vector generado en a) y elimine todos los
-viajes cuya distancia recorrida sea igual a 100 km. 
-Nota: para realizar el inciso b, el vector debe recorrerse una única vez. }
 
-Program ejercicio3;
+{ La Comisión Provincial por la Memoria desea analizar la información de los proyectos presentados en el
+programa Jóvenes y Memoria durante la convocatoria 2020. Cada proyecto posee un código único, un título, el
+docente coordinador (DNI, nombre y apellido, email), la cantidad de alumnos que participan del proyecto, el
+nombre de la escuela y la localidad a la que pertenecen. Cada escuela puede presentar más de un proyecto. La
+información se ingresa ordenada consecutivamente por localidad y, para cada localidad, por escuela. Realizar
+un programa que lea la información de los proyectos hasta que se ingrese el proyecto con código -1 (que no
+debe procesarse), e informe:
+● Cantidad total de escuelas que participan en la convocatoria 2018 y cantidad de escuelas por cada
+localidad.
+● Nombres de las dos escuelas con mayor cantidad de alumnos participantes.
+● Título de los proyectos de la localidad de Daireaux cuyo código posee igual cantidad de dígitos pares e
+impares. }
 
-Const 
-  dimF = 200;
+Program ejercicio8;
 
 Type 
-  diaDelMes = 1..31;
-
-  viaje = Record
-    dia: diaDelMes;
-    monto: real;
-    distancia: integer;
+  docenteCoordinador = Record
+    dni: string;
+    nombre: string;
+    apellido: string;
+    email: string;
+  End;
+  proyecto = Record
+    codigo: integer;
+    titulo: string;
+    docente: docenteCoordinador;
+    cantAlumnos: integer;
+    escuela: string;
+    localidad: string;
   End;
 
-  vectorViajes = array [1..dimF] Of viaje;
+Function igualParesImpares(num: integer): boolean;
 
-
-// Inciso A 
-Procedure leerUnViaje(Var v: viaje);
-Begin
-  writeln('Ingrese la distancia del viaje');
-  readln(v.distancia);
-  If (v.distancia <> 0) Then
-    Begin
-      writeln('Ingrese el dia del mes en el que se realizo el viaje');
-      readln(v.dia);
-      writeln('Ingrese el monto de dinero transportado');
-      readln(v.monto);
-    End;
-End;
-
-Procedure leerViajes(Var dimL: integer; Var v: vectorViajes);
 Var 
-  viajeActual: viaje;
+  digito, pares, impares: integer;
 Begin
-  dimL := 0;
-  leerUnViaje(viajeActual);
-  While ((viajeActual.distancia <> 0) And (dimL<dimF)) Do
-    Begin
-      dimL := dimL+1;
-      v[dimL] := viajeActual;
-      leerUnViaje(viajeActual);
-    End;
-End;
+  pares := 0;
+  impares := 0;
 
-// Inciso B
-Procedure procesarViajes(dimL: integer; v: vectorViajes);
-Var 
-  promedio, sumaMontos, montoMin: real;
-  i, distMin, diaMin: integer;
-  vDias: array[diaDelMes] Of integer;
-
-Begin
-  sumaMontos := 0;
-  montoMin := 9999;
-  For i:=1 To 31 Do
+  While (num<>0) Do
     Begin
-      vDias[i] := 0;
-    End;
-
-  For i:=1 To dimL Do
-    Begin
-      sumaMontos := sumaMontos+v[i].monto;
-      If (v[i].monto < montoMin) Then
-        Begin
-          montoMin := v[i].monto;
-          distMin := v[i].distancia;
-          diaMin := v[i].dia;
-        End;
-      vDias[v[i].dia] := vDias[v[i].dia]+1;
-    End;
-
-  If (dimL > 0) Then
-    Begin
-      promedio := sumaMontos/dimL;
-      writeln('El monto promedio transportado de los viajes realizados es: ',
-              promedio: 0: 2);
-    End
-  Else
-    Begin
-      writeln('Error: no se registraron viajes para calcular el promedio.')
-
-    End;
-  writeln('El viaje con menos dinero fue el dia: ', diaMin,
-          ' y la distancia fue de: ', distMin);
-  For i:=1 To 31 Do
-    Begin
-      writeln('El dia ', i,' hubo ', vDias[i],' viajes');
-    End;
-End;
-
-// Inciso C
-Procedure eliminarViajes(Var dimL: integer; Var v:vectorViajes);
-Var 
-  i, j: integer;
-Begin
-  i := 1;
-  While (i <= dimL ) Do
-    Begin
-      If (v[i].distancia = 100) Then
-        Begin
-          For j:=i To (dimL-1) Do
-            Begin
-              v[j] := v[j+1];
-            End;
-          dimL := dimL-1;
-        End
+      digito := num Mod 10;
+      If (digito Mod 2 = 0) Then
+        pares := pares+1
       Else
-        Begin
-          i := i+1;
-        End;
+        impares := impares+1;
+      num := num Div 10;
+    End;
+
+  igualParesImpares := (pares = impares);
+End;
+
+Function textoEscuela(cant: integer): string;
+Begin
+  If (cant = 1) Then
+    textoEscuela := 'escuela'
+  Else
+    textoEscuela := 'escuelas';
+End;
+
+Procedure leerProyecto (Var p: proyecto);
+Begin
+  writeln('Ingrese el codigo del proyecto');
+  readln(p.codigo);
+  If (p.codigo <> -1) Then
+    Begin
+      writeln('Ingrese el titulo del proyecto');
+      readln(p.titulo);
+      writeln('Ingrese el dni del docente a cargo');
+      readln(p.docente.dni);
+      writeln('Ingrese el nombre del docente a cargo');
+      readln(p.docente.nombre);
+      writeln('Ingrese el apellido del docente a cargo');
+      readln(p.docente.apellido);
+      writeln('Ingrese el email del docente a cargo');
+      readln(p.docente.email);
+      writeln('Ingrese la cantidad de alumnos');
+      readln(p.cantAlumnos);
+      writeln('Ingrese el nombre de la escuela');
+      readln(p.escuela);
+      writeln('Ingrese la localidad de la escuela');
+      readln(p.localidad);
     End;
 End;
 
 Var 
-  viajes: vectorViajes;
-  dimL: integer;
+  p: proyecto;
+  locActual, escActual, maxEsc1, maxEsc2: string;
+  cantTotalEsc, cantEscLoc, cantAluEsc, max1, max2: integer;
 
 Begin
-  // Inciso A: Cargar los viajes
-  leerViajes(dimL, viajes);
+  cantTotalEsc := 0;
+  max1 := -1;
+  max2 := -1;
+  maxEsc1 := '';
+  maxEsc2 := '';
 
-  // Verificamos que se haya cargado al menos un viaje válido
-  If (dimL > 0) Then
+  leerProyecto(p);
+
+  While (p.codigo <> -1) Do
     Begin
-      // Inciso B: Procesar e informar promedios, mínimos y conteo por días
-      procesarViajes(dimL, viajes);
+      locActual := p.localidad;
+      cantEscLoc := 0;
+      // se resetea por cada localidad nueva
 
-      // Inciso C: Eliminar viajes de exactamente 100 km
-      eliminarViajes(dimL, viajes);
+      // --- Localidad ---
+      While (p.codigo <> -1) And (p.localidad = locActual) Do
+        Begin
+          escActual := p.escuela;
+          cantAluEsc := 0;
+          // se resetea por cada escuela nueva
 
-      writeln('Limpieza finalizada con exito.');
-      writeln('La nueva cantidad total de viajes almacenados es: ', dimL);
-    End
-  Else
-    Begin
-      // Si el primer ingreso fue 0
-      writeln('No se registraron viajes validos en el sistema. Fin del programa.');
+          // --- Escuela ---
+          While (p.codigo <> -1) And (p.localidad = locActual) And (p.escuela =
+                escActual) Do
+            Begin
+              cantAluEsc := cantAluEsc+p.cantAlumnos;
+              If (p.localidad = 'Daireaux') And (igualParesImpares(p.codigo))
+                Then
+                writeln('Proyecto destacado de Daireaux: ', p.titulo);
+
+              leerProyecto(p);
+            End;
+
+          cantEscLoc := cantEscLoc+1;
+          cantTotalEsc := cantTotalEsc+1;
+
+          If (cantAluEsc>max1) Then
+            Begin
+              max2 := max1;
+              maxEsc2 := maxEsc1;
+              max1 := cantAluEsc;
+              maxEsc1 := escActual;
+            End
+          Else If (cantAluEsc>max2) Then
+                 Begin
+                   max2 := cantAluEsc;
+                   maxEsc2 := escActual;
+                 End;
+        End;
+
+      // --- Termino de leer todas las escuelas de ESA localidad
+      writeln('En ', locActual,' hay ', cantEscLoc, ' ', textoEscuela(cantEscLoc
+      ), '.');
+
     End;
+
+  writeln('Cantidad total de escuelas: ', cantTotalEsc);
+  writeln('Las dos escuelas con mas alumnos son: ', maxEsc1,' y ', maxEsc2);
+
 End.

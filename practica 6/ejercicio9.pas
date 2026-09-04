@@ -1,145 +1,153 @@
-{ Utilizando el programa del ejercicio 1, realizar los siguientes módulos:
-a. EstáOrdenada: recibe la lista como parámetro y retorna true si la misma se encuentra ordenada, o
-false en caso contrario.
-b. Eliminar: recibe como parámetros la lista y un valor entero, y elimina dicho valor de la lista (si
-existe). Nota: la lista podría no estar ordenada.
-c. Sublista: recibe como parámetros la lista L y dos valores enteros A y B, y retorna una nueva lista
-con todos los elementos de la lista L mayores que A y menores que B.
-d. Modifique el módulo Sublista del inciso anterior, suponiendo que la lista L se encuentra ordenada
-de manera ascendente.
-e. Modifique el módulo Sublista del inciso anterior, suponiendo que la lista L se encuentra ordenada
-de manera descendente. }
 
-Program JugamosConListas;
+
+{ La Comisión Provincial por la Memoria desea analizar la información de los proyectos presentados en el
+programa Jóvenes y Memoria durante la convocatoria 2020. Cada proyecto posee un código único, un título, el
+docente coordinador (DNI, nombre y apellido, email), la cantidad de alumnos que participan del proyecto, el
+nombre de la escuela y la localidad a la que pertenecen. Cada escuela puede presentar más de un proyecto. La
+información se ingresa ordenada consecutivamente por localidad y, para cada localidad, por escuela. Realizar
+un programa que lea la información de los proyectos hasta que se ingrese el proyecto con código -1 (que no
+debe procesarse), e informe:
+● Cantidad total de escuelas que participan en la convocatoria 2018 y cantidad de escuelas por cada
+localidad.
+● Nombres de las dos escuelas con mayor cantidad de alumnos participantes.
+● Título de los proyectos de la localidad de Daireaux cuyo código posee igual cantidad de dígitos pares e
+impares. }
+
+Program ejercicio8;
 
 Type 
-  lista = ^nodo;
-  nodo = Record
-    num : integer;
-    sig : lista;
+  docenteCoordinador = Record
+    dni: string;
+    nombre: string;
+    apellido: string;
+    email: string;
+  End;
+  proyecto = Record
+    codigo: integer;
+    titulo: string;
+    docente: docenteCoordinador;
+    cantAlumnos: integer;
+    escuela: string;
+    localidad: string;
   End;
 
-Procedure armarNodo(Var L: lista; v: integer);
+Function igualParesImpares(num: integer): boolean;
 
 Var 
-  aux : lista;
+  digito, pares, impares: integer;
 Begin
-  new(aux);
-  aux^.num := v;
-  aux^.sig := L;
-  L := aux;
-End;
+  pares := 0;
+  impares := 0;
 
-// Inciso A
-Function estaOrdenada(L: lista): boolean;
-
-Var 
-  ok: boolean;
-Begin
-  ok := true;
-  While ((L <> Nil) And (L^.sig <> Nil) And ok ) Do
+  While (num<>0) Do
     Begin
-      If (L^.num > L^.sig^.num) Then
-        Begin
-          ok := false;
-        End
+      digito := num Mod 10;
+      If (digito Mod 2 = 0) Then
+        pares := pares+1
       Else
-        Begin
-          L := L^.sig;
-        End;
+        impares := impares+1;
+      num := num Div 10;
     End;
 
-  estaOrdenada := ok;
+  igualParesImpares := (pares = impares);
 End;
 
-// Inciso B
-Procedure eliminar(Var L: lista; valor: integer);
+Function textoEscuela(cant: integer): string;
+Begin
+  If (cant = 1) Then
+    textoEscuela := 'escuela'
+  Else
+    textoEscuela := 'escuelas';
+End;
+
+Procedure leerProyecto (Var p: proyecto);
+Begin
+  writeln('Ingrese el codigo del proyecto');
+  readln(p.codigo);
+  If (p.codigo <> -1) Then
+    Begin
+      writeln('Ingrese el titulo del proyecto');
+      readln(p.titulo);
+      writeln('Ingrese el dni del docente a cargo');
+      readln(p.docente.dni);
+      writeln('Ingrese el nombre del docente a cargo');
+      readln(p.docente.nombre);
+      writeln('Ingrese el apellido del docente a cargo');
+      readln(p.docente.apellido);
+      writeln('Ingrese el email del docente a cargo');
+      readln(p.docente.email);
+      writeln('Ingrese la cantidad de alumnos');
+      readln(p.cantAlumnos);
+      writeln('Ingrese el nombre de la escuela');
+      readln(p.escuela);
+      writeln('Ingrese la localidad de la escuela');
+      readln(p.localidad);
+    End;
+End;
 
 Var 
-  actual, anterior: lista;
+  p: proyecto;
+  locActual, escActual, maxEsc1, maxEsc2: string;
+  cantTotalEsc, cantEscLoc, cantAluEsc, max1, max2: integer;
+
 Begin
-  actual := L;
-  anterior := Nil;
+  cantTotalEsc := 0;
+  max1 := -1;
+  max2 := -1;
+  maxEsc1 := '';
+  maxEsc2 := '';
 
-  // Busco el nodo a eliminar
-  While (actual <> Nil) And (actual^.num <> valor) Do
-    Begin
-      anterior := actual;
-      actual := actual^.sig;
-    End;
+  leerProyecto(p);
 
-  // Si lo encontré, lo elimino
-  If (actual <> Nil) Then
+  While (p.codigo <> -1) Do
     Begin
-      // Caso A: El nodo a eliminar es el primero de la lista
-      If (anterior = Nil) Then
+      locActual := p.localidad;
+      cantEscLoc := 0;
+      // se resetea por cada localidad nueva
+
+      // --- Localidad ---
+      While (p.codigo <> -1) And (p.localidad = locActual) Do
         Begin
-          L := actual^.sig;
-          // Actualizo el puntero de la lista al siguiente nodo
-        End
-        // Caso B: El nodo a eliminar no es el primero de la lista
-      Else
-        Begin
-          anterior^.sig := actual^.sig;
-          // El anterior se engancha directamente con el siguiente
+          escActual := p.escuela;
+          cantAluEsc := 0;
+          // se resetea por cada escuela nueva
+
+          // --- Escuela ---
+          While (p.codigo <> -1) And (p.localidad = locActual) And (p.escuela =
+                escActual) Do
+            Begin
+              cantAluEsc := cantAluEsc+p.cantAlumnos;
+              If (p.localidad = 'Daireaux') And (igualParesImpares(p.codigo))
+                Then
+                writeln('Proyecto destacado de Daireaux: ', p.titulo);
+
+              leerProyecto(p);
+            End;
+
+          cantEscLoc := cantEscLoc+1;
+          cantTotalEsc := cantTotalEsc+1;
+
+          If (cantAluEsc>max1) Then
+            Begin
+              max2 := max1;
+              maxEsc2 := maxEsc1;
+              max1 := cantAluEsc;
+              maxEsc1 := escActual;
+            End
+          Else If (cantAluEsc>max2) Then
+                 Begin
+                   max2 := cantAluEsc;
+                   maxEsc2 := escActual;
+                 End;
         End;
-      // Libero la memoria del nodo eliminado
-      dispose(actual);
+
+      // --- Termino de leer todas las escuelas de ESA localidad
+      writeln('En ', locActual,' hay ', cantEscLoc, ' ', textoEscuela(cantEscLoc
+      ), '.');
+
     End;
-End;
 
-// Inciso C
-Procedure sublista(L: lista; A, B: integer; Var nueva: lista);
-Begin
-  nueva := Nil;
+  writeln('Cantidad total de escuelas: ', cantTotalEsc);
+  writeln('Las dos escuelas con mas alumnos son: ', maxEsc1,' y ', maxEsc2);
 
-  While (L <> Nil) Do
-    Begin
-      If (L^.num > A) And (L^.num < B) Then
-        armarNodo(nueva, L^.num);
-      L := L^.sig;
-    End;
-End;
-
-// Inciso D
-Procedure sublistaOrdenada(L: lista; A, B: integer; Var nueva: lista);
-Begin
-  nueva := Nil;
-
-  While ((L <> Nil) And (L^.num < B)) Do
-    Begin
-      If (L^.num > A) Then
-        armarNodo(nueva, L^.num);
-      L := L^.sig;
-    End;
-End;
-
-// Inciso E
-Procedure sublistaOrdenadaDescendente(L: lista; A, B: integer; Var nueva: lista)
-;
-Begin
-  nueva := Nil;
-
-  While ((L <> Nil) And (L^.num > A)) Do
-    Begin
-      If (L^.num < B) Then
-        armarNodo(nueva, L^.num);
-      L := L^.sig;
-    End;
-End;
-
-
-Var 
-  pri : lista;
-  valor : integer;
-Begin
-  pri := Nil;
-  writeln('Ingrese un numero');
-  read(valor);
-  While (valor <> 0) Do
-    Begin
-      armarNodo(pri, valor);
-      writeln('Ingrese un numero');
-      read(valor);
-    End;
 End.

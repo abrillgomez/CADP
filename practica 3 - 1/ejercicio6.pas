@@ -25,17 +25,17 @@ Type
 Procedure leerMicroprocesador (Var m: microprocesador);
 Begin
   writeln('Ingrese la cantidad de cores del microprocesador: ');
-  readln(m.cantCores);
+  readlnln(m.cantCores);
   If (m.cantCores <> 0) Then
     Begin
       writeln('Ingrese la marca del microprocesador: ');
-      readln(m.marca);
+      readlnln(m.marca);
       writeln('Ingrese la linea del microprocesador: ');
-      readln(m.linea);
+      readlnln(m.linea);
       writeln('Ingrese la velocidad del reloj del microprocesador: ');
-      readln(m.velReloj);
+      readlnln(m.velReloj);
       writeln('Ingrese el tamanio de los transistores del microprocesador: ');
-      readln(m.tamTransistores);
+      readlnln(m.tamTransistores);
     End;
 End;
 
