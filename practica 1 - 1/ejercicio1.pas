@@ -8,14 +8,14 @@ Var
 
 Begin
 
-  write('Ingrese el primer numero:');
+  writeln('Ingrese el primer numero:');
   readln(num1);
-  write('Ingrese el segundo numero:');
+  writeln('Ingrese el segundo numero:');
   readln(num2);
   If (num1 > num2) Then
-    write('El numero mayor es: ', num1)
+    writeln('El numero mayor es: ', num1)
   Else If (num2 > num1) Then
-         write('El numero mayor es: ', num2)
+         writeln('El numero mayor es: ', num2)
   Else
-    write('Los numeros leidos son iguales');
+    writeln('Los numeros leidos son iguales');
 End.

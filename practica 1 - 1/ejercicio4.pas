@@ -9,11 +9,11 @@ Var
   cant: integer;
 
 Begin
-  write('Ingrese un numero real:');
+  writeln('Ingrese un numero real:');
   readln(num1);
   aux := num1 * 2;
   cant := 1;
-  write('Ingrese otro numero real:');
+  writeln('Ingrese otro numero real:');
   readln(num2);
 
   While (num2 <> aux) And (cant<10) Do
@@ -23,5 +23,5 @@ Begin
     End;
 
   If (num2 <> aux) Then
-    write('No se ha ingresado el doble de X');
+    writeln('No se ha ingresado el doble de X');
 End.

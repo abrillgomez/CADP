@@ -7,10 +7,10 @@ Var
   num1, num2, aux: real;
 
 Begin
-  write('Ingrese un numero real:');
+  writeln('Ingrese un numero real:');
   readln(num1);
   aux := num1 * 2;
-  write('Ingrese otro numero real:');
+  writeln('Ingrese otro numero real:');
   readln(num2);
 
   While (num2 <> aux) Do

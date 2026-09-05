@@ -135,11 +135,11 @@ Var
 Begin
   pri := Nil;
   writeln('Ingrese un numero');
-  read(valor);
+  readln(valor);
   While (valor <> 0) Do
     Begin
       armarNodo(pri, valor);
       writeln('Ingrese un numero');
-      read(valor);
+      readln(valor);
     End;
 End.

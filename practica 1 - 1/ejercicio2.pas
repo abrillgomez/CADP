@@ -9,10 +9,10 @@ Var
   num: real;
 
 Begin
-  write('Ingrese un numero real:');
+  writeln('Ingrese un numero real:');
   readln(num);
   If (num < 0) Then
-    write(-num:0:2)
+    writeln(-num:0:2)
   Else
-    write(num:0:2);
+    writeln(num:0:2);
 End.
