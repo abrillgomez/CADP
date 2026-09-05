@@ -1,152 +1,111 @@
-
-{ La Comisión Provincial por la Memoria desea analizar la información de los proyectos presentados en el
-programa Jóvenes y Memoria durante la convocatoria 2020. Cada proyecto posee un código único, un título, el
-docente coordinador (DNI, nombre y apellido, email), la cantidad de alumnos que participan del proyecto, el
-nombre de la escuela y la localidad a la que pertenecen. Cada escuela puede presentar más de un proyecto. La
-información se ingresa ordenada consecutivamente por localidad y, para cada localidad, por escuela. Realizar
-un programa que lea la información de los proyectos hasta que se ingrese el proyecto con código -1 (que no
-debe procesarse), e informe:
-● Cantidad total de escuelas que participan en la convocatoria 2018 y cantidad de escuelas por cada
-localidad.
-● Nombres de las dos escuelas con mayor cantidad de alumnos participantes.
-● Título de los proyectos de la localidad de Daireaux cuyo código posee igual cantidad de dígitos pares e
-impares. }
+{ Realizar un programa que lea y almacene la información de 400 alumnos ingresantes a la Facultad de
+Informática de la UNLP en el año 2020. De cada alumno se lee: nro de inscripción, DNI, apellido,
+nombre y año de nacimiento. Una vez leída y almacenada toda la información, calcular e informar:
+a. El porcentaje de alumnos con DNI compuesto sólo por dígitos pares.
+b. Apellido y nombre de los dos alumnos de mayor edad.
+}
 
 Program ejercicio8;
 
 Type 
-  docenteCoordinador = Record
-    dni: string;
-    nombre: string;
+  alumno = Record
+    numInscripcion: integer;
+    dni: integer;
     apellido: string;
-    email: string;
-  End;
-  proyecto = Record
-    codigo: integer;
-    titulo: string;
-    docente: docenteCoordinador;
-    cantAlumnos: integer;
-    escuela: string;
-    localidad: string;
+    nombre: string;
+    anioNac: integer;
   End;
 
-Function igualParesImpares(num: integer): boolean;
+  vectorAlumnos = array[1..400] Of alumno;
 
+Procedure leerAlumno(Var alu:alumno);
+Begin
+  writeln('Ingrese el numero de inscripcion del alumno');
+  readln(alu.numInscripcion);
+  writeln('Ingrese el dni del alumno');
+  readln(alu.dni);
+  writeln('Ingrese el apellido del alumno');
+  readln(alu.apellido);
+  writeln('Ingrese el nombre del alumno');
+  readln(alu.nombre);
+  writeln('Ingrese el anio de nacimiento del alumno');
+  readln(alu.anioNac);
+End;
+
+Procedure cargarVector(Var vAlumnos:vectorAlumnos);
 Var 
-  digito, pares, impares: integer;
+  i: integer;
 Begin
-  pares := 0;
-  impares := 0;
-
-  While (num<>0) Do
+  For i:=1 To 400 Do
     Begin
-      digito := num Mod 10;
-      If (digito Mod 2 = 0) Then
-        pares := pares+1
-      Else
-        impares := impares+1;
-      num := num Div 10;
-    End;
-
-  igualParesImpares := (pares = impares);
-End;
-
-Function textoEscuela(cant: integer): string;
-Begin
-  If (cant = 1) Then
-    textoEscuela := 'escuela'
-  Else
-    textoEscuela := 'escuelas';
-End;
-
-Procedure leerProyecto (Var p: proyecto);
-Begin
-  writeln('Ingrese el codigo del proyecto');
-  readln(p.codigo);
-  If (p.codigo <> -1) Then
-    Begin
-      writeln('Ingrese el titulo del proyecto');
-      readln(p.titulo);
-      writeln('Ingrese el dni del docente a cargo');
-      readln(p.docente.dni);
-      writeln('Ingrese el nombre del docente a cargo');
-      readln(p.docente.nombre);
-      writeln('Ingrese el apellido del docente a cargo');
-      readln(p.docente.apellido);
-      writeln('Ingrese el email del docente a cargo');
-      readln(p.docente.email);
-      writeln('Ingrese la cantidad de alumnos');
-      readln(p.cantAlumnos);
-      writeln('Ingrese el nombre de la escuela');
-      readln(p.escuela);
-      writeln('Ingrese la localidad de la escuela');
-      readln(p.localidad);
+      leerAlumno(vAlumnos[i]);
     End;
 End;
 
+Function soloPares(dni: integer): boolean;
 Var 
-  p: proyecto;
-  locActual, escActual, maxEsc1, maxEsc2: string;
-  cantTotalEsc, cantEscLoc, cantAluEsc, max1, max2: integer;
-
+  digito: integer;
+  cumple: boolean;
 Begin
-  cantTotalEsc := 0;
-  max1 := -1;
-  max2 := -1;
-  maxEsc1 := '';
-  maxEsc2 := '';
-
-  leerProyecto(p);
-
-  While (p.codigo <> -1) Do
+  digito := 0;
+  cumple := true;
+  While ((dni <> 0) And (cumple=true)) Do
     Begin
-      locActual := p.localidad;
-      cantEscLoc := 0;
-      // se resetea por cada localidad nueva
-
-      // --- Localidad ---
-      While (p.codigo <> -1) And (p.localidad = locActual) Do
+      digito := dni Mod 10;
+      If ((digito Mod 2)<>0) Then
         Begin
-          escActual := p.escuela;
-          cantAluEsc := 0;
-          // se resetea por cada escuela nueva
-
-          // --- Escuela ---
-          While (p.codigo <> -1) And (p.localidad = locActual) And (p.escuela =
-                escActual) Do
-            Begin
-              cantAluEsc := cantAluEsc+p.cantAlumnos;
-              If (p.localidad = 'Daireaux') And (igualParesImpares(p.codigo))
-                Then
-                writeln('Proyecto destacado de Daireaux: ', p.titulo);
-
-              leerProyecto(p);
-            End;
-
-          cantEscLoc := cantEscLoc+1;
-          cantTotalEsc := cantTotalEsc+1;
-
-          If (cantAluEsc>max1) Then
-            Begin
-              max2 := max1;
-              maxEsc2 := maxEsc1;
-              max1 := cantAluEsc;
-              maxEsc1 := escActual;
-            End
-          Else If (cantAluEsc>max2) Then
-                 Begin
-                   max2 := cantAluEsc;
-                   maxEsc2 := escActual;
-                 End;
+          cumple := false;
         End;
-
-      // --- Termino de leer todas las escuelas de ESA localidad
-      writeln('En ', locActual,' hay ', cantEscLoc, ' ', textoEscuela(cantEscLoc
-      ), '.');
-
+      dni := dni Div 10;
     End;
+  soloPares := cumple;
+End;
 
-  writeln('Cantidad total de escuelas: ', cantTotalEsc);
-  writeln('Las dos escuelas con mas alumnos son: ', maxEsc1,' y ', maxEsc2);
+Procedure procesarAlumnos(v: vectorAlumnos);
+Var 
+  i, cantPares, min1, min2: integer;
+  ape1, nom1, ape2, nom2: string;
+Begin
+  cantPares := 0;
+  min1 := 9999;
+  min2 := 9999;
+  ape1 := '';
+  nom1 := '';
+  ape2 := '';
+  nom2 := '';
 
+  For i:=1 To 400 Do
+    Begin
+      If (soloPares(v[i].dni) = true) Then
+        cantPares := cantPares+1;
+
+      If (v[i].anioNac < min1) Then
+        Begin
+          min2 := min1;
+          nom2 := nom1;
+          ape2 := ape1;
+          min1 := v[i].anioNac;
+          nom1 := v[i].nombre;
+          ape1 := v[i].apellido;
+        End
+      Else If (v[i].anioNac < min2) Then
+             Begin
+               min2 := v[i].anioNac;
+               nom2 := v[i].nombre;
+               ape2 := v[i].apellido;
+             End;
+    End;
+  writeln('El porcentaje de DNI pares es: ', (cantPares * 100) / 400
+  : 0: 2,
+       ' %'
+       );
+  writeln('El alumno de mayor edad es: ', nom1, ' ', ape1);
+  writeln('El segundo almuno de mayor edad es: ', nom2, ' ', ape2);
+End;
+
+Var 
+  ingresantes: vectorAlumnos;
+Begin
+  cargarVector(ingresantes);
+  procesarAlumnos(ingresantes);
 End.

@@ -1,152 +1,177 @@
+{ Una productora nacional realiza un casting de personas para la selección de
+actores extras de una nueva película, para ello se debe leer y almacenar la 
+información de las personas que desean participar de dicho casting. De cada 
+persona se lee: DNI, apellido y nombre, edad y el código de género de actuación 
+que prefiere (1: drama, 2: romántico, 3: acción, 4: suspenso, 5: terror). La lectura
+finaliza cuando llega una persona con DNI 33555444, la cual debe procesarse.
+Una vez finalizada la lectura de todas las personas, se pide:
+a. Informar la cantidad de personas cuyo DNI contiene más dígitos pares que
+impares.
+b. Informar los dos códigos de género más elegidos.
+c. Realizar un módulo que reciba un DNI, lo busque y lo elimine de la estructura. El DNI 
+puede no existir. Invocar dicho módulo en el programa principal.}
 
-{ La Comisión Provincial por la Memoria desea analizar la información de los proyectos presentados en el
-programa Jóvenes y Memoria durante la convocatoria 2020. Cada proyecto posee un código único, un título, el
-docente coordinador (DNI, nombre y apellido, email), la cantidad de alumnos que participan del proyecto, el
-nombre de la escuela y la localidad a la que pertenecen. Cada escuela puede presentar más de un proyecto. La
-información se ingresa ordenada consecutivamente por localidad y, para cada localidad, por escuela. Realizar
-un programa que lea la información de los proyectos hasta que se ingrese el proyecto con código -1 (que no
-debe procesarse), e informe:
-● Cantidad total de escuelas que participan en la convocatoria 2018 y cantidad de escuelas por cada
-localidad.
-● Nombres de las dos escuelas con mayor cantidad de alumnos participantes.
-● Título de los proyectos de la localidad de Daireaux cuyo código posee igual cantidad de dígitos pares e
-impares. }
-
-Program ejercicio8;
+Program ejercicio1;
 
 Type 
-  docenteCoordinador = Record
-    dni: string;
-    nombre: string;
+
+  codigoGenero = 1..5;
+
+  persona = Record
+    dni: integer;
     apellido: string;
-    email: string;
-  End;
-  proyecto = Record
-    codigo: integer;
-    titulo: string;
-    docente: docenteCoordinador;
-    cantAlumnos: integer;
-    escuela: string;
-    localidad: string;
+    nombre: string;
+    edad: integer;
+    codigo: codigoGenero;
   End;
 
-Function igualParesImpares(num: integer): boolean;
+  lista = ^nodo;
+
+  nodo = Record
+    dato: persona;
+    sig: lista;
+  End;
+
+  vectorGeneros = array [1..5] Of integer;
+
+Procedure leerPersona (Var p: persona);
+Begin
+  readln(p.dni, p.apellido, p.nombre, p.edad, p.codigo);
+End;
+
+Procedure agregarAdelante (Var l: lista; p: persona);
 
 Var 
-  digito, pares, impares: integer;
+  nuevoNodo: lista;
 Begin
-  pares := 0;
-  impares := 0;
+  new(nuevoNodo);
+  nuevoNodo^.dato := p;
+  nuevoNodo^.sig := l;
+  l := nuevoNodo;
+End;
 
-  While (num<>0) Do
+
+Procedure cargarLista (Var l: lista);
+
+Var 
+  p: persona;
+Begin
+  Repeat
+    leerPersona(p);
+    agregarAdelante(l, p);
+  Until (p.dni = 33555444)
+End;
+
+Function digitosPares (dni: integer): boolean;
+
+Var 
+  digito, contPares, contImpares: integer;
+Begin
+  contPares := 0;
+  contImpares := 0;
+  While (dni <> 0) Do
     Begin
-      digito := num Mod 10;
+      digito := dni Mod 10;
       If (digito Mod 2 = 0) Then
-        pares := pares+1
+        Begin
+          contPares := contPares+1;
+        End
       Else
-        impares := impares+1;
-      num := num Div 10;
+        Begin
+          contImpares := contImpares+1;
+        End;
+      dni := dni Div 10;
     End;
 
-  igualParesImpares := (pares = impares);
-End;
-
-Function textoEscuela(cant: integer): string;
-Begin
-  If (cant = 1) Then
-    textoEscuela := 'escuela'
+  If contPares > contImpares Then
+    digitosPares := true
   Else
-    textoEscuela := 'escuelas';
+    digitosPares := false;
 End;
 
-Procedure leerProyecto (Var p: proyecto);
-Begin
-  writeln('Ingrese el codigo del proyecto');
-  readln(p.codigo);
-  If (p.codigo <> -1) Then
-    Begin
-      writeln('Ingrese el titulo del proyecto');
-      readln(p.titulo);
-      writeln('Ingrese el dni del docente a cargo');
-      readln(p.docente.dni);
-      writeln('Ingrese el nombre del docente a cargo');
-      readln(p.docente.nombre);
-      writeln('Ingrese el apellido del docente a cargo');
-      readln(p.docente.apellido);
-      writeln('Ingrese el email del docente a cargo');
-      readln(p.docente.email);
-      writeln('Ingrese la cantidad de alumnos');
-      readln(p.cantAlumnos);
-      writeln('Ingrese el nombre de la escuela');
-      readln(p.escuela);
-      writeln('Ingrese la localidad de la escuela');
-      readln(p.localidad);
-    End;
-End;
+Procedure procesarLista (l: lista);
 
 Var 
-  p: proyecto;
-  locActual, escActual, maxEsc1, maxEsc2: string;
-  cantTotalEsc, cantEscLoc, cantAluEsc, max1, max2: integer;
-
+  aux: lista;
+  i, cont, max1, max2, codMax1, codMax2: integer;
+  v: vectorGeneros;
 Begin
-  cantTotalEsc := 0;
+  cont := 0;
   max1 := -1;
   max2 := -1;
-  maxEsc1 := '';
-  maxEsc2 := '';
+  codMax1 := 0;
+  codMax2 := 0;
 
-  leerProyecto(p);
-
-  While (p.codigo <> -1) Do
+  For i:=1 To 5 Do
     Begin
-      locActual := p.localidad;
-      cantEscLoc := 0;
-      // se resetea por cada localidad nueva
+      v[i] := 0;
+    End;
 
-      // --- Localidad ---
-      While (p.codigo <> -1) And (p.localidad = locActual) Do
+  aux := l;
+
+  While (aux <> Nil) Do
+    Begin
+      If (digitosPares(aux^.dato.dni) = true) Then
         Begin
-          escActual := p.escuela;
-          cantAluEsc := 0;
-          // se resetea por cada escuela nueva
-
-          // --- Escuela ---
-          While (p.codigo <> -1) And (p.localidad = locActual) And (p.escuela =
-                escActual) Do
-            Begin
-              cantAluEsc := cantAluEsc+p.cantAlumnos;
-              If (p.localidad = 'Daireaux') And (igualParesImpares(p.codigo))
-                Then
-                writeln('Proyecto destacado de Daireaux: ', p.titulo);
-
-              leerProyecto(p);
-            End;
-
-          cantEscLoc := cantEscLoc+1;
-          cantTotalEsc := cantTotalEsc+1;
-
-          If (cantAluEsc>max1) Then
-            Begin
-              max2 := max1;
-              maxEsc2 := maxEsc1;
-              max1 := cantAluEsc;
-              maxEsc1 := escActual;
-            End
-          Else If (cantAluEsc>max2) Then
-                 Begin
-                   max2 := cantAluEsc;
-                   maxEsc2 := escActual;
-                 End;
+          cont := cont+1;
         End;
 
-      // --- Termino de leer todas las escuelas de ESA localidad
-      writeln('En ', locActual,' hay ', cantEscLoc, ' ', textoEscuela(cantEscLoc
-      ), '.');
+      v[aux^.dato.codigo] := v[aux^.dato.codigo]+1;
+      aux := aux^.sig;
+    End;
+
+  For i:=1 To 5 Do
+    Begin
+      If (v[i] > max1) Then
+        Begin
+          codMax2 := codMax1;
+          max2 := max1;
+          max1 := v[i];
+          codMax1 := i;
+        End
+      Else If (v[i]>max2) Then
+             Begin
+               max2 := v[i];
+               codMax2 := i;
+             End;
 
     End;
 
-  writeln('Cantidad total de escuelas: ', cantTotalEsc);
-  writeln('Las dos escuelas con mas alumnos son: ', maxEsc1,' y ', maxEsc2);
+  writeln('Cantidad de personas que tienen mas digitos pares que impares: ',
+          cont);
+  writeln('Los dos codigos de generos mas elegidos son: ', codMax1,' y ',
+          codMax2);
 
+End;
+
+Procedure eliminarDni (Var l: lista; dni: integer);
+
+Var 
+  act, ant: lista;
+Begin
+  act := l;
+  While (act <> Nil) And (act^.dato.dni <> dni) Do
+    Begin
+      ant := act;
+      act := act^.sig;
+    End;
+  If (act <> Nil) Then
+    Begin
+      If (act = l) Then
+        l := l^.sig
+      Else
+        ant^.sig := act^.sig;
+      dispose(act);
+    End;
+End;
+
+Var 
+  l: lista;
+  dniEliminado: integer;
+Begin
+  l := Nil;
+  cargarLista(l);
+  procesarLista(l);
+  readln(dniEliminado);
+  eliminarDni(l, dniEliminado);
 End.

@@ -1,152 +1,221 @@
+{ La Facultad de Informática desea procesar la información de los alumnos que finalizaron la carrera de
+Analista Programador Universitario. Para ello se deberá leer la información de cada alumno, a saber:
+número de alumno, apellido, nombres, dirección de correo electrónico, año de ingreso, año de egreso y las
+notas obtenidas en cada una de las 24 materias que aprobó (los aplazos no se registran).
+1. Realizar un módulo que lea y almacene la información de los alumnos hasta que se ingrese el alumno
+con número de alumno -1, el cual no debe procesarse. Las 24 notas correspondientes a cada alumno
+deben quedar ordenadas de forma descendente. 
+2. Una vez leída y almacenada la información del inciso 1, se solicita calcular e informar:
+    a. El promedio de notas obtenido por cada alumno.
+    b. La cantidad de alumnos ingresantes 2012 cuyo número de alumno está compuesto únicamente
+    por dígitos impares.
+    c. El apellido, nombres y dirección de correo electrónico de los dos alumnos que más rápido se
+    recibieron (o sea, que tardaron menos años).
+3. Realizar un módulo que, dado un número de alumno leído desde teclado, lo busque y elimine de la
+estructura generada en el inciso 1. El alumno puede no existir. }
 
-{ La Comisión Provincial por la Memoria desea analizar la información de los proyectos presentados en el
-programa Jóvenes y Memoria durante la convocatoria 2020. Cada proyecto posee un código único, un título, el
-docente coordinador (DNI, nombre y apellido, email), la cantidad de alumnos que participan del proyecto, el
-nombre de la escuela y la localidad a la que pertenecen. Cada escuela puede presentar más de un proyecto. La
-información se ingresa ordenada consecutivamente por localidad y, para cada localidad, por escuela. Realizar
-un programa que lea la información de los proyectos hasta que se ingrese el proyecto con código -1 (que no
-debe procesarse), e informe:
-● Cantidad total de escuelas que participan en la convocatoria 2018 y cantidad de escuelas por cada
-localidad.
-● Nombres de las dos escuelas con mayor cantidad de alumnos participantes.
-● Título de los proyectos de la localidad de Daireaux cuyo código posee igual cantidad de dígitos pares e
-impares. }
-
-Program ejercicio8;
+Program ejercicio7;
 
 Type 
-  docenteCoordinador = Record
-    dni: string;
-    nombre: string;
+
+  vectorNotas = array [1..24] Of integer;
+
+  alumno = Record
+    numAlumno: integer;
     apellido: string;
-    email: string;
-  End;
-  proyecto = Record
-    codigo: integer;
-    titulo: string;
-    docente: docenteCoordinador;
-    cantAlumnos: integer;
-    escuela: string;
-    localidad: string;
+    nombres: string;
+    correo: string;
+    anioIngreso: integer;
+    anioEgreso: integer;
+    notas: vectorNotas;
   End;
 
-Function igualParesImpares(num: integer): boolean;
+  lista = ^nodo;
+
+  nodo = Record
+    dato: alumno;
+    sig: lista;
+  End;
+
+  // Inciso 1
+Procedure insertarOrdenado (Var v: vectorNotas; Var dimL: integer; nota: integer
+);
 
 Var 
-  digito, pares, impares: integer;
+  pos, j: integer;
 Begin
-  pares := 0;
-  impares := 0;
+  pos := 1;
+  While ((pos <= dimL) And (v[pos] > nota)) Do
+    Begin
+      pos := pos + 1;
+    End;
 
-  While (num<>0) Do
+  For j:=dimL Downto pos Do
+    Begin
+      v[j+1] := v[j];
+    End;
+
+  v[pos] := nota;
+  dimL := dimL+1;
+End;
+
+Procedure leerAlumno (Var a: alumno);
+
+Var 
+  i, nota, dimL: integer;
+Begin
+  readln(a.numAlumno);
+  If (a.numAlumno <> -1) Then
+    Begin
+      readln(a.apellido, a.nombres, a.correo, a.anioIngreso, a.anioEgreso);
+      dimL := 0;
+      For i := 1 To 24 Do
+        Begin
+          readln(nota);
+          insertarOrdenado(a.notas, dimL, nota);
+        End;
+    End;
+End;
+
+Procedure agregarAdelante(Var l: lista; a: alumno);
+
+Var 
+  nue: lista;
+Begin
+  new(nue);
+  nue^.dato := a;
+  nue^.sig := l;
+  l := nue;
+End;
+
+Procedure cargarLista(Var l: lista);
+
+Var 
+  a: alumno;
+Begin
+  leerAlumno(a);
+  While (a.numAlumno <> -1) Do
+    Begin
+      agregarAdelante(l, a);
+      leerAlumno(a);
+    End;
+End;
+
+// Inciso 2
+Function soloImpares(num: integer): boolean;
+
+Var 
+  digito: integer;
+  cumple: boolean;
+Begin
+  cumple := true;
+
+  While ((num <> 0) And (cumple = true)) Do
     Begin
       digito := num Mod 10;
-      If (digito Mod 2 = 0) Then
-        pares := pares+1
+
+      If ((digito Mod 2) = 0) Then
+        Begin
+          cumple := false;
+        End
       Else
-        impares := impares+1;
-      num := num Div 10;
+        Begin
+          num := num Div 10;
+        End;
+    End;
+  soloImpares := cumple;
+End;
+
+Procedure procesarLista(l: lista);
+
+Var 
+  i, suma, cont, tiempo, min1, min2: integer;
+  ape1, ape2, nom1, nom2, correo1, correo2: string;
+Begin
+  cont := 0;
+  min1 := 9999;
+  min2 := 9999;
+  While (l <> Nil) Do
+    Begin
+      suma := 0;
+      For i:= 1 To 24 Do
+        Begin
+          suma := suma + l^.dato.notas[i];
+        End;
+      writeln('El promedio del alumno es de: ', suma/24:0:2);
+      If ((l^.dato.anioIngreso = 2012) And (soloImpares(l^.dato.numAlumno)))
+        Then
+        Begin
+          cont := cont + 1;
+        End;
+      tiempo := l^.dato.anioEgreso - l^.dato.anioIngreso;
+      If (tiempo < min1) Then
+        Begin
+          min2 := min1;
+          ape2 := ape1;
+          nom2 := nom1;
+          correo2 := correo1;
+          min1 := tiempo;
+          ape1 := l^.dato.apellido;
+          nom1 := l^.dato.nombres;
+          correo1 := l^.dato.correo;
+        End
+      Else If (tiempo < min2) Then
+             Begin
+               min2 := tiempo;
+               ape2 := l^.dato.apellido;
+               nom2 := l^.dato.nombres;
+               correo2 := l^.dato.correo;
+             End;
+
+      l := l^.sig;
+    End;
+  writeln('Alumnos del 2012 con legajo impar: ', cont);
+  writeln('1er puesto: ', ape1, ' ', nom1, ' - ', correo1);
+  writeln('2do puesto: ', ape2, ' ', nom2, ' - ', correo2);
+End;
+
+// Inciso 3
+Procedure eliminarAlumno(Var l: lista; numEliminar: integer);
+
+Var 
+  act, ant: lista;
+Begin
+  act := l;
+  While (act <> Nil) And (act^.dato.numAlumno <> numEliminar) Do
+    Begin
+      ant := act;
+      act := act^.sig;
     End;
 
-  igualParesImpares := (pares = impares);
-End;
-
-Function textoEscuela(cant: integer): string;
-Begin
-  If (cant = 1) Then
-    textoEscuela := 'escuela'
-  Else
-    textoEscuela := 'escuelas';
-End;
-
-Procedure leerProyecto (Var p: proyecto);
-Begin
-  writeln('Ingrese el codigo del proyecto');
-  readln(p.codigo);
-  If (p.codigo <> -1) Then
+  If (act <> Nil) Then
     Begin
-      writeln('Ingrese el titulo del proyecto');
-      readln(p.titulo);
-      writeln('Ingrese el dni del docente a cargo');
-      readln(p.docente.dni);
-      writeln('Ingrese el nombre del docente a cargo');
-      readln(p.docente.nombre);
-      writeln('Ingrese el apellido del docente a cargo');
-      readln(p.docente.apellido);
-      writeln('Ingrese el email del docente a cargo');
-      readln(p.docente.email);
-      writeln('Ingrese la cantidad de alumnos');
-      readln(p.cantAlumnos);
-      writeln('Ingrese el nombre de la escuela');
-      readln(p.escuela);
-      writeln('Ingrese la localidad de la escuela');
-      readln(p.localidad);
+      If (act = l) Then
+        Begin
+          l := l^.sig;
+        End
+      Else
+        Begin
+          ant^.sig := act^.sig;
+        End;
+      dispose(act);
     End;
 End;
 
 Var 
-  p: proyecto;
-  locActual, escActual, maxEsc1, maxEsc2: string;
-  cantTotalEsc, cantEscLoc, cantAluEsc, max1, max2: integer;
-
+  l: lista;
+  numAEliminar: integer;
 Begin
-  cantTotalEsc := 0;
-  max1 := -1;
-  max2 := -1;
-  maxEsc1 := '';
-  maxEsc2 := '';
+  l := Nil;
 
-  leerProyecto(p);
+  // Inciso 1
+  cargarLista(l);
 
-  While (p.codigo <> -1) Do
-    Begin
-      locActual := p.localidad;
-      cantEscLoc := 0;
-      // se resetea por cada localidad nueva
+  // Inciso 2
+  procesarLista(l);
 
-      // --- Localidad ---
-      While (p.codigo <> -1) And (p.localidad = locActual) Do
-        Begin
-          escActual := p.escuela;
-          cantAluEsc := 0;
-          // se resetea por cada escuela nueva
-
-          // --- Escuela ---
-          While (p.codigo <> -1) And (p.localidad = locActual) And (p.escuela =
-                escActual) Do
-            Begin
-              cantAluEsc := cantAluEsc+p.cantAlumnos;
-              If (p.localidad = 'Daireaux') And (igualParesImpares(p.codigo))
-                Then
-                writeln('Proyecto destacado de Daireaux: ', p.titulo);
-
-              leerProyecto(p);
-            End;
-
-          cantEscLoc := cantEscLoc+1;
-          cantTotalEsc := cantTotalEsc+1;
-
-          If (cantAluEsc>max1) Then
-            Begin
-              max2 := max1;
-              maxEsc2 := maxEsc1;
-              max1 := cantAluEsc;
-              maxEsc1 := escActual;
-            End
-          Else If (cantAluEsc>max2) Then
-                 Begin
-                   max2 := cantAluEsc;
-                   maxEsc2 := escActual;
-                 End;
-        End;
-
-      // --- Termino de leer todas las escuelas de ESA localidad
-      writeln('En ', locActual,' hay ', cantEscLoc, ' ', textoEscuela(cantEscLoc
-      ), '.');
-
-    End;
-
-  writeln('Cantidad total de escuelas: ', cantTotalEsc);
-  writeln('Las dos escuelas con mas alumnos son: ', maxEsc1,' y ', maxEsc2);
-
+  // Inciso 3
+  writeln('Ingrese el numero de alumno que desea eliminar');
+  readln(numAEliminar);
+  eliminarAlumno(l, numAEliminar);
 End.

@@ -1,153 +1,176 @@
+{ Una cátedra dispone de información de sus alumnos (a lo sumo 1000). De cada alumno se conoce 
+nro de alumno, apellido y nombre y cantidad de asistencias a clase. Dicha información 
+se encuentra ordenada por nro de alumno de manera ascendente. Se pide:
+a. Un módulo que retorne la posición del alumno con un nro de alumno recibido por
+parámetro. El alumno seguro existe.
+b. Un módulo que reciba un alumno y lo inserte en el vector.
+c. Un módulo que reciba la posición de un alumno dentro del vector y lo
+elimine.
+d. Un módulo que reciba un nro de alumno y elimine dicho alumno del vector.
+e. Un módulo que elimine del vector todos los alumnos con cantidad de asistencias
+en 0.
+Nota: Realizar el programa principal que invoque los módulos desarrollados en
+los incisos previos con datos leídos de teclado. }
 
+Program ejercicio4;
 
-{ La Comisión Provincial por la Memoria desea analizar la información de los proyectos presentados en el
-programa Jóvenes y Memoria durante la convocatoria 2020. Cada proyecto posee un código único, un título, el
-docente coordinador (DNI, nombre y apellido, email), la cantidad de alumnos que participan del proyecto, el
-nombre de la escuela y la localidad a la que pertenecen. Cada escuela puede presentar más de un proyecto. La
-información se ingresa ordenada consecutivamente por localidad y, para cada localidad, por escuela. Realizar
-un programa que lea la información de los proyectos hasta que se ingrese el proyecto con código -1 (que no
-debe procesarse), e informe:
-● Cantidad total de escuelas que participan en la convocatoria 2018 y cantidad de escuelas por cada
-localidad.
-● Nombres de las dos escuelas con mayor cantidad de alumnos participantes.
-● Título de los proyectos de la localidad de Daireaux cuyo código posee igual cantidad de dígitos pares e
-impares. }
-
-Program ejercicio8;
+Const 
+  dimF = 1000;
 
 Type 
-  docenteCoordinador = Record
-    dni: string;
-    nombre: string;
+  alumno = Record
+    numAlumno: integer;
     apellido: string;
-    email: string;
-  End;
-  proyecto = Record
-    codigo: integer;
-    titulo: string;
-    docente: docenteCoordinador;
-    cantAlumnos: integer;
-    escuela: string;
-    localidad: string;
+    nombre: string;
+    asistencias: integer;
   End;
 
-Function igualParesImpares(num: integer): boolean;
+  vectorAlumnos = array [1..dimF] Of alumno;
+
+  // Inciso A
+Function buscarAlumno(dimL: integer; v: vectorAlumnos; nroBuscado: integer):integer;
 
 Var 
-  digito, pares, impares: integer;
+  pri, ult, medio: integer;
 Begin
-  pares := 0;
-  impares := 0;
-
-  While (num<>0) Do
+  pri := 1;
+  ult := dimL;
+  medio := (pri+ult) Div 2;
+  While ((pri<=ult) And (nroBuscado<>v[medio].numAlumno)) Do
     Begin
-      digito := num Mod 10;
-      If (digito Mod 2 = 0) Then
-        pares := pares+1
-      Else
-        impares := impares+1;
-      num := num Div 10;
-    End;
-
-  igualParesImpares := (pares = impares);
-End;
-
-Function textoEscuela(cant: integer): string;
-Begin
-  If (cant = 1) Then
-    textoEscuela := 'escuela'
-  Else
-    textoEscuela := 'escuelas';
-End;
-
-Procedure leerProyecto (Var p: proyecto);
-Begin
-  writeln('Ingrese el codigo del proyecto');
-  readln(p.codigo);
-  If (p.codigo <> -1) Then
-    Begin
-      writeln('Ingrese el titulo del proyecto');
-      readln(p.titulo);
-      writeln('Ingrese el dni del docente a cargo');
-      readln(p.docente.dni);
-      writeln('Ingrese el nombre del docente a cargo');
-      readln(p.docente.nombre);
-      writeln('Ingrese el apellido del docente a cargo');
-      readln(p.docente.apellido);
-      writeln('Ingrese el email del docente a cargo');
-      readln(p.docente.email);
-      writeln('Ingrese la cantidad de alumnos');
-      readln(p.cantAlumnos);
-      writeln('Ingrese el nombre de la escuela');
-      readln(p.escuela);
-      writeln('Ingrese la localidad de la escuela');
-      readln(p.localidad);
-    End;
-End;
-
-Var 
-  p: proyecto;
-  locActual, escActual, maxEsc1, maxEsc2: string;
-  cantTotalEsc, cantEscLoc, cantAluEsc, max1, max2: integer;
-
-Begin
-  cantTotalEsc := 0;
-  max1 := -1;
-  max2 := -1;
-  maxEsc1 := '';
-  maxEsc2 := '';
-
-  leerProyecto(p);
-
-  While (p.codigo <> -1) Do
-    Begin
-      locActual := p.localidad;
-      cantEscLoc := 0;
-      // se resetea por cada localidad nueva
-
-      // --- Localidad ---
-      While (p.codigo <> -1) And (p.localidad = locActual) Do
+      If (nroBuscado < v[medio].numAlumno) Then
         Begin
-          escActual := p.escuela;
-          cantAluEsc := 0;
-          // se resetea por cada escuela nueva
+          ult := medio-1;
+        End
+      Else
+        Begin
+          pri := medio+1;
+        End;
+      medio := (pri+ult) Div 2;
+    End;
+  buscarAlumno := medio;
+End;
 
-          // --- Escuela ---
-          While (p.codigo <> -1) And (p.localidad = locActual) And (p.escuela =
-                escActual) Do
-            Begin
-              cantAluEsc := cantAluEsc+p.cantAlumnos;
-              If (p.localidad = 'Daireaux') And (igualParesImpares(p.codigo))
-                Then
-                writeln('Proyecto destacado de Daireaux: ', p.titulo);
+// Inciso B
+Procedure insertarAlumno(Var dimL: integer; Var v: vectorAlumnos; alumnoNuevo:
+                         alumno);
 
-              leerProyecto(p);
-            End;
+Var 
+  i, j: integer;
+Begin
+  i := 1;
+  While ((i <= dimL) And (v[i].numAlumno < alumnoNuevo.numAlumno)) Do
+    Begin
+      i := i+1;
+    End;
 
-          cantEscLoc := cantEscLoc+1;
-          cantTotalEsc := cantTotalEsc+1;
+  For j:=dimL Downto i Do
+    Begin
+      v[j+1] := v[j];
+    End;
 
-          If (cantAluEsc>max1) Then
-            Begin
-              max2 := max1;
-              maxEsc2 := maxEsc1;
-              max1 := cantAluEsc;
-              maxEsc1 := escActual;
-            End
-          Else If (cantAluEsc>max2) Then
-                 Begin
-                   max2 := cantAluEsc;
-                   maxEsc2 := escActual;
-                 End;
+  v[i] := alumnoNuevo;
+  dimL := dimL+1;
+
+End;
+
+// Inciso C
+Procedure eliminarAlumno(Var dimL: integer; Var v: vectorAlumnos;
+                         posAlumno: integer);
+
+Var 
+  i: integer;
+Begin
+  For i:=posAlumno To (dimL - 1) Do
+    Begin
+      v[i] := v[i+1];
+    End;
+  dimL := dimL-1;
+End;
+
+// Inciso D
+Procedure eliminarAlumnoPorNro(Var dimL: integer; Var v: vectorAlumnos;
+                               nroAlumno: integer);
+
+Var 
+  pos: integer;
+Begin
+  pos := buscarAlumno(dimL, v, nroAlumno);
+  eliminarAlumno(dimL, v, pos);
+End;
+
+// Inciso E
+Procedure eliminarAsistenciasCero(Var dimL: integer; Var v: vectorAlumnos);
+Var 
+  i: integer;
+Begin
+  i := 1;
+  While (i <= dimL) Do
+    Begin
+      If (v[i].asistencias = 0) Then
+        Begin
+          eliminarAlumno(dimL, v, i);
+        End
+      Else
+        Begin
+          i := i + 1;
+        End;
+    End;
+End;
+
+Var 
+  v: vectorAlumnos;
+  dimL, posBuscada, posEliminar, nroBuscado, nroEliminar: integer;
+  nuevoAlu: alumno;
+
+Begin
+  dimL := 0;
+
+  writeln('Ingrese numero de alumno:');
+  readln(nuevoAlu.numAlumno);
+  writeln('Ingrese apellido:');
+  readln(nuevoAlu.apellido);
+  writeln('Ingrese nombre:');
+  readln(nuevoAlu.nombre);
+  writeln('Ingrese cantidad de asistencias:');
+  readln(nuevoAlu.asistencias);
+
+  insertarAlumno(dimL, v, nuevoAlu);
+  writeln('Alumno insertado correctamente.');
+
+  If (dimL > 0) Then
+    Begin
+      writeln('Ingrese el nro de alumno a buscar (asegurese de que exista):');
+      readln(nroBuscado);
+      posBuscada := buscarAlumno(dimL, v, nroBuscado);
+      writeln('El alumno se encuentra en la posicion: ', posBuscada);
+
+      writeln('Ingrese la posicion del vector a eliminar (ej: 1):');
+      readln(posEliminar);
+      eliminarAlumno(dimL, v, posEliminar);
+      writeln('Alumno en posicion ', posEliminar, ' eliminado. Quedan ', dimL,
+              ' alumnos.');
+
+      If (dimL = 0) Then
+        Begin
+          writeln('(El vector quedo vacio, por favor cargue un nro de alumno para probar la eliminacion)'
+          );
+          readln(nuevoAlu.numAlumno);
+          insertarAlumno(dimL, v, nuevoAlu);
         End;
 
-      // --- Termino de leer todas las escuelas de ESA localidad
-      writeln('En ', locActual,' hay ', cantEscLoc, ' ', textoEscuela(cantEscLoc
-      ), '.');
+      writeln('Ingrese un Nro de Alumno para eliminar:');
+      readln(nroEliminar);
+      eliminarAlumnoPorNro(dimL, v, nroEliminar);
+      writeln('Alumno con nro ', nroEliminar, ' eliminado.');
 
+      eliminarAsistenciasCero(dimL, v);
+      writeln('Se eliminaron todos los alumnos con 0 asistencias.');
+      writeln('Cantidad final de alumnos en el sistema: ', dimL);
+    End
+  Else
+    Begin
+      writeln('No hay alumnos cargados en el sistema.');
     End;
-
-  writeln('Cantidad total de escuelas: ', cantTotalEsc);
-  writeln('Las dos escuelas con mas alumnos son: ', maxEsc1,' y ', maxEsc2);
 
 End.

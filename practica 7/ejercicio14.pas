@@ -1,152 +1,162 @@
+{ La biblioteca de la Universidad Nacional de La Plata necesita un programa para
+administrar información de préstamos de libros efectuados en marzo de 2020. Para ello, 
+se debe leer la información de los préstamos realizados. De cada préstamo se lee: 
+nro. de préstamo, ISBN del libro prestado, nro. de socio al que se prestó el libro, 
+día del préstamo (1..31). La información de los préstamos se lee de manera ordenada por 
+ISBN y finaliza cuando se ingresa el ISBN -1 (que no debe procesarse).
+Se pide:
+  a. Generar una estructura que contenga, para cada ISBN de libro, la cantidad de
+  veces que fue prestado.
+  Esta estructura debe quedar ordenada por ISBN de libro.
+  b. Calcular e informar el día del mes en que se realizaron menos préstamos.
+  c. Calcular e informar el porcentaje de préstamos que poseen nro. de préstamo
+  impar y nro. de socio par. }
 
-{ La Comisión Provincial por la Memoria desea analizar la información de los proyectos presentados en el
-programa Jóvenes y Memoria durante la convocatoria 2020. Cada proyecto posee un código único, un título, el
-docente coordinador (DNI, nombre y apellido, email), la cantidad de alumnos que participan del proyecto, el
-nombre de la escuela y la localidad a la que pertenecen. Cada escuela puede presentar más de un proyecto. La
-información se ingresa ordenada consecutivamente por localidad y, para cada localidad, por escuela. Realizar
-un programa que lea la información de los proyectos hasta que se ingrese el proyecto con código -1 (que no
-debe procesarse), e informe:
-● Cantidad total de escuelas que participan en la convocatoria 2018 y cantidad de escuelas por cada
-localidad.
-● Nombres de las dos escuelas con mayor cantidad de alumnos participantes.
-● Título de los proyectos de la localidad de Daireaux cuyo código posee igual cantidad de dígitos pares e
-impares. }
-
-Program ejercicio8;
+Program ejercicio14;
 
 Type 
-  docenteCoordinador = Record
-    dni: string;
-    nombre: string;
-    apellido: string;
-    email: string;
-  End;
-  proyecto = Record
-    codigo: integer;
-    titulo: string;
-    docente: docenteCoordinador;
-    cantAlumnos: integer;
-    escuela: string;
-    localidad: string;
+
+  rangoDias = 1..31;
+
+  prestamo = Record
+    nro: integer;
+    isbn: integer;
+    socio: integer;
+    dia: rangoDias;
   End;
 
-Function igualParesImpares(num: integer): boolean;
+  libro = Record
+    isbn: integer;
+    cant: integer;
+  End;
+
+  vector = array[rangoDias] Of integer;
+
+  lista = ^nodo;
+
+  nodo = Record
+    dato: libro;
+    sig: lista;
+  End;
+
+Procedure inicializarVector (Var v: vector);
 
 Var 
-  digito, pares, impares: integer;
-Begin
-  pares := 0;
-  impares := 0;
+  i: integer;
 
-  While (num<>0) Do
+Begin
+
+  For i:=1 To 31 Do
     Begin
-      digito := num Mod 10;
-      If (digito Mod 2 = 0) Then
-        pares := pares+1
-      Else
-        impares := impares+1;
-      num := num Div 10;
-    End;
-
-  igualParesImpares := (pares = impares);
-End;
-
-Function textoEscuela(cant: integer): string;
-Begin
-  If (cant = 1) Then
-    textoEscuela := 'escuela'
-  Else
-    textoEscuela := 'escuelas';
-End;
-
-Procedure leerProyecto (Var p: proyecto);
-Begin
-  writeln('Ingrese el codigo del proyecto');
-  readln(p.codigo);
-  If (p.codigo <> -1) Then
-    Begin
-      writeln('Ingrese el titulo del proyecto');
-      readln(p.titulo);
-      writeln('Ingrese el dni del docente a cargo');
-      readln(p.docente.dni);
-      writeln('Ingrese el nombre del docente a cargo');
-      readln(p.docente.nombre);
-      writeln('Ingrese el apellido del docente a cargo');
-      readln(p.docente.apellido);
-      writeln('Ingrese el email del docente a cargo');
-      readln(p.docente.email);
-      writeln('Ingrese la cantidad de alumnos');
-      readln(p.cantAlumnos);
-      writeln('Ingrese el nombre de la escuela');
-      readln(p.escuela);
-      writeln('Ingrese la localidad de la escuela');
-      readln(p.localidad);
+      v[i] := 0;
     End;
 End;
 
-Var 
-  p: proyecto;
-  locActual, escActual, maxEsc1, maxEsc2: string;
-  cantTotalEsc, cantEscLoc, cantAluEsc, max1, max2: integer;
-
+Procedure leerPrestamo (Var p: prestamo);
 Begin
-  cantTotalEsc := 0;
-  max1 := -1;
-  max2 := -1;
-  maxEsc1 := '';
-  maxEsc2 := '';
-
-  leerProyecto(p);
-
-  While (p.codigo <> -1) Do
+  readln(p.isbn);
+  If (p.isbn <> -1) Then
     Begin
-      locActual := p.localidad;
-      cantEscLoc := 0;
-      // se resetea por cada localidad nueva
+      readln(p.nro, p.socio, p.dia);
+    End;
 
-      // --- Localidad ---
-      While (p.codigo <> -1) And (p.localidad = locActual) Do
+End;
+
+Procedure agregarAdelante(Var l: lista; isbnAct, cantAct: integer);
+
+Var 
+  nuevo: lista;
+Begin
+  new(nuevo);
+  nuevo^.dato.isbn := isbnAct;
+  nuevo^.dato.cant := cantAct;
+  nuevo^.sig := l;
+  l := nuevo;
+End;
+
+Procedure procesarDatos (Var L: lista; Var v: vector; Var porc: real);
+
+Var 
+  p: prestamo;
+  actual, cant, cumplen, total: integer;
+Begin
+  L := Nil;
+  cumplen := 0;
+  total := 0;
+
+  leerPrestamo(p);
+  While (p.isbn <> -1) Do
+    Begin
+      cant := 0;
+      actual := p.isbn;
+      While (p.isbn <> -1) And (p.isbn = actual) Do
         Begin
-          escActual := p.escuela;
-          cantAluEsc := 0;
-          // se resetea por cada escuela nueva
+          cant := cant + 1;
+          v[p.dia] := v[p.dia] + 1;
+          total := total + 1;
 
-          // --- Escuela ---
-          While (p.codigo <> -1) And (p.localidad = locActual) And (p.escuela =
-                escActual) Do
+          If ((p.socio Mod 2) = 0) And ((p.nro Mod 2) = 1) Then
             Begin
-              cantAluEsc := cantAluEsc+p.cantAlumnos;
-              If (p.localidad = 'Daireaux') And (igualParesImpares(p.codigo))
-                Then
-                writeln('Proyecto destacado de Daireaux: ', p.titulo);
-
-              leerProyecto(p);
+              cumplen := cumplen + 1;
             End;
 
-          cantEscLoc := cantEscLoc+1;
-          cantTotalEsc := cantTotalEsc+1;
-
-          If (cantAluEsc>max1) Then
-            Begin
-              max2 := max1;
-              maxEsc2 := maxEsc1;
-              max1 := cantAluEsc;
-              maxEsc1 := escActual;
-            End
-          Else If (cantAluEsc>max2) Then
-                 Begin
-                   max2 := cantAluEsc;
-                   maxEsc2 := escActual;
-                 End;
+          leerPrestamo(p);
         End;
 
-      // --- Termino de leer todas las escuelas de ESA localidad
-      writeln('En ', locActual,' hay ', cantEscLoc, ' ', textoEscuela(cantEscLoc
-      ), '.');
-
+      agregarAdelante(L, actual, cant);
+      // Agregar atrás también puede ser
     End;
 
-  writeln('Cantidad total de escuelas: ', cantTotalEsc);
-  writeln('Las dos escuelas con mas alumnos son: ', maxEsc1,' y ', maxEsc2);
+  If (total > 0) Then
+    porc := (cumplen / total) * 100
+  Else
+    porc := 0;
+End;
 
+Function minimo (v: vector): rangoDias;
+
+Var 
+  i, diaMin: rangoDias;
+  valorMin: integer;
+Begin
+  valorMin := 9999;
+  For i := 1 To 31 Do
+    Begin
+      If (v[i] < valorMin) Then
+        Begin
+          valorMin := v[i];
+          diaMin := i;
+        End;
+    End;
+  minimo := diaMin;
+End;
+
+Procedure imprimirDatos(l: lista; diaMin: rangoDias; porc: real);
+Begin
+
+  While (l <> Nil) Do
+    Begin
+      writeln('ISBN: ', l^.dato.isbn, ' - Prestado: ', l^.dato.cant, ' veces.');
+      l := l^.sig;
+    End;
+
+  writeln('El dia con menos prestamos fue el: ', diaMin);
+  writeln('Porcentaje de condicion (nro impar y socio par): ', porc:0:2, '%');
+
+End;
+
+Var 
+  v: vector;
+  l: lista;
+  porcentaje: real;
+  minimoDia: rangoDias;
+
+Begin
+  inicializarVector(v);
+  procesarDatos(l, v, porcentaje);
+
+{ Módulo encargado de leer los prestamos y devolver la 
+  lista con la cant de prestamos, el vector cargado con el porcentaje }
+  minimoDia := minimo(v);
+  imprimirDatos(l, minimoDia, porcentaje);
 End.

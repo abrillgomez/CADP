@@ -1,152 +1,131 @@
+{ Realice un programa que resuelva los siguientes incisos:
+  a. Lea nombres de alumnos y los almacene en un vector de a lo sumo 500 elementos. La lectura finaliza
+  cuando se lee el nombre ‘ZZZ’, que no debe procesarse.
+  b. Lea un nombre y elimine la primera ocurrencia de dicho nombre en el vector.
+  c. Lea un nombre y lo inserte en la posición 4 del vector.
+  d. Lea un nombre y lo agregue al vector.
+Nota: Realizar todas las validaciones necesarias.}
 
-{ La Comisión Provincial por la Memoria desea analizar la información de los proyectos presentados en el
-programa Jóvenes y Memoria durante la convocatoria 2020. Cada proyecto posee un código único, un título, el
-docente coordinador (DNI, nombre y apellido, email), la cantidad de alumnos que participan del proyecto, el
-nombre de la escuela y la localidad a la que pertenecen. Cada escuela puede presentar más de un proyecto. La
-información se ingresa ordenada consecutivamente por localidad y, para cada localidad, por escuela. Realizar
-un programa que lea la información de los proyectos hasta que se ingrese el proyecto con código -1 (que no
-debe procesarse), e informe:
-● Cantidad total de escuelas que participan en la convocatoria 2018 y cantidad de escuelas por cada
-localidad.
-● Nombres de las dos escuelas con mayor cantidad de alumnos participantes.
-● Título de los proyectos de la localidad de Daireaux cuyo código posee igual cantidad de dígitos pares e
-impares. }
+Program ejercicio2;
 
-Program ejercicio8;
+Const 
+  dimF = 500;
 
 Type 
-  docenteCoordinador = Record
-    dni: string;
-    nombre: string;
-    apellido: string;
-    email: string;
-  End;
-  proyecto = Record
-    codigo: integer;
-    titulo: string;
-    docente: docenteCoordinador;
-    cantAlumnos: integer;
-    escuela: string;
-    localidad: string;
-  End;
+  alumno = string;
+  vectorAlumnos = array[1..dimF] Of alumno;
 
-Function igualParesImpares(num: integer): boolean;
-
+  // Inciso A
+Procedure cargarVector(Var v:vectorAlumnos; Var dimL:integer);
 Var 
-  digito, pares, impares: integer;
+  nombre: string;
 Begin
-  pares := 0;
-  impares := 0;
-
-  While (num<>0) Do
+  dimL := 0;
+  writeln('Ingrese el nombre del alumno');
+  readln(nombre);
+  While ((nombre <> 'ZZZ') And (dimL < dimF)) Do
     Begin
-      digito := num Mod 10;
-      If (digito Mod 2 = 0) Then
-        pares := pares+1
-      Else
-        impares := impares+1;
-      num := num Div 10;
-    End;
-
-  igualParesImpares := (pares = impares);
-End;
-
-Function textoEscuela(cant: integer): string;
-Begin
-  If (cant = 1) Then
-    textoEscuela := 'escuela'
-  Else
-    textoEscuela := 'escuelas';
-End;
-
-Procedure leerProyecto (Var p: proyecto);
-Begin
-  writeln('Ingrese el codigo del proyecto');
-  readln(p.codigo);
-  If (p.codigo <> -1) Then
-    Begin
-      writeln('Ingrese el titulo del proyecto');
-      readln(p.titulo);
-      writeln('Ingrese el dni del docente a cargo');
-      readln(p.docente.dni);
-      writeln('Ingrese el nombre del docente a cargo');
-      readln(p.docente.nombre);
-      writeln('Ingrese el apellido del docente a cargo');
-      readln(p.docente.apellido);
-      writeln('Ingrese el email del docente a cargo');
-      readln(p.docente.email);
-      writeln('Ingrese la cantidad de alumnos');
-      readln(p.cantAlumnos);
-      writeln('Ingrese el nombre de la escuela');
-      readln(p.escuela);
-      writeln('Ingrese la localidad de la escuela');
-      readln(p.localidad);
+      dimL := dimL+1;
+      v[dimL] := nombre;
+      writeln('Ingrese el nombre del alumno');
+      readln(nombre);
     End;
 End;
 
+// Inciso B
+Procedure eliminarNombre(Var v:vectorAlumnos; Var dimL: integer; nomBuscado:
+                         String);
+
 Var 
-  p: proyecto;
-  locActual, escActual, maxEsc1, maxEsc2: string;
-  cantTotalEsc, cantEscLoc, cantAluEsc, max1, max2: integer;
-
+  pos, i: integer;
 Begin
-  cantTotalEsc := 0;
-  max1 := -1;
-  max2 := -1;
-  maxEsc1 := '';
-  maxEsc2 := '';
-
-  leerProyecto(p);
-
-  While (p.codigo <> -1) Do
+  pos := 1;
+  While ((pos <= dimL) And (v[pos] <> nomBuscado)) Do
     Begin
-      locActual := p.localidad;
-      cantEscLoc := 0;
-      // se resetea por cada localidad nueva
+      pos := pos+1;
+    End;
 
-      // --- Localidad ---
-      While (p.codigo <> -1) And (p.localidad = locActual) Do
+  If (pos<=dimL) Then
+    Begin
+      For i:=pos To (dimL-1) Do
         Begin
-          escActual := p.escuela;
-          cantAluEsc := 0;
-          // se resetea por cada escuela nueva
-
-          // --- Escuela ---
-          While (p.codigo <> -1) And (p.localidad = locActual) And (p.escuela =
-                escActual) Do
-            Begin
-              cantAluEsc := cantAluEsc+p.cantAlumnos;
-              If (p.localidad = 'Daireaux') And (igualParesImpares(p.codigo))
-                Then
-                writeln('Proyecto destacado de Daireaux: ', p.titulo);
-
-              leerProyecto(p);
-            End;
-
-          cantEscLoc := cantEscLoc+1;
-          cantTotalEsc := cantTotalEsc+1;
-
-          If (cantAluEsc>max1) Then
-            Begin
-              max2 := max1;
-              maxEsc2 := maxEsc1;
-              max1 := cantAluEsc;
-              maxEsc1 := escActual;
-            End
-          Else If (cantAluEsc>max2) Then
-                 Begin
-                   max2 := cantAluEsc;
-                   maxEsc2 := escActual;
-                 End;
+          v[i] := v[i+1];
         End;
+      dimL := dimL-1;
+    End;
+End;
 
-      // --- Termino de leer todas las escuelas de ESA localidad
-      writeln('En ', locActual,' hay ', cantEscLoc, ' ', textoEscuela(cantEscLoc
-      ), '.');
+// Inciso C
+Procedure insertarNombre(Var v: vectorAlumnos; Var dimL: integer; nombreNuevo:
+                         String);
 
+Var 
+  i: integer;
+Begin
+  If (dimL < dimF) Then
+    Begin
+      For i:=dimL Downto 4 Do
+        Begin
+          v[i+1] := v[i];
+        End;
+      v[4] := nombreNuevo;
+      dimL := dimL+1;
+      writeln('Alumno insertado con éxito en la posición 4.');
+    End
+  Else
+    Begin
+      writeln('Error: El vector está lleno...');
     End;
 
-  writeln('Cantidad total de escuelas: ', cantTotalEsc);
-  writeln('Las dos escuelas con mas alumnos son: ', maxEsc1,' y ', maxEsc2);
+End;
 
+// Inciso D
+Procedure agregarNombre(Var v: vectorAlumnos; Var dimL: integer; nombreNuevo:
+                        String);
+Begin
+  If (dimL < dimF) Then
+    Begin
+      dimL := dimL+1;
+      v[dimL] := nombreNuevo;
+    End
+  Else
+    Begin
+      writeln('Error: no hay espacio para agregar mas alumnos.')
+    End;
+End;
+
+
+Var 
+  v: vectorAlumnos;
+  dimL: integer;
+  nombreBuscado, nombreInsertar, nombreAgregar: string;
+
+Begin
+  // Inciso A: Cargar el vector
+  cargarVector(v, dimL);
+
+  // Verificamos que se hayan cargado datos antes de procesar el resto
+  If (dimL > 0) Then
+    Begin
+      // Inciso B: Eliminar nombre
+      writeln('Ingrese el nombre del alumno que desea eliminar:');
+      readln(nombreBuscado);
+      eliminarNombre(v, dimL, nombreBuscado);
+
+      // Inciso C: Insertar nombre en pos 4
+      writeln('Ingrese el nombre del alumno a insertar:');
+      readln(nombreInsertar);
+      insertarNombre(v, dimL, nombreInsertar);
+
+      // Inciso D: Agregar nombre al final
+      writeln('Ingrese el nombre del alumno a agregar:');
+      readln(nombreAgregar);
+      agregarNombre(v, dimL, nombreAgregar);
+
+      writeln('Programa finalizado. La cantidad final de alumnos es: ', dimL);
+    End
+  Else
+    Begin
+      writeln('No se ingresaron alumnos. Fin del programa.');
+    End;
 End.

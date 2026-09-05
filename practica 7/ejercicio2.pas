@@ -54,7 +54,7 @@ Var
   c: cliente;
 Begin
   Repeat
-    readlnln(c.codigo, c.dni, c.apellido, c.nombre, c.poliza, c.monto);
+    Readln(c.codigo, c.dni, c.apellido, c.nombre, c.poliza, c.monto);
     agregarAdelante(l, c);
   Until (c.codigo = 1122)
 End;

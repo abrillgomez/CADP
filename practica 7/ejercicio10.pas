@@ -61,22 +61,22 @@ Var
   hectareas: real;
 Begin
   e.dimL := 0;
-  readlnln(hectareas);
+  readln(hectareas);
   While ((hectareas <> 0) And (e.dimL < 20)) Do
     Begin
       e.dimL := e.dimL+1;
       e.cultivos[e.dimL].cantHect := hectareas;
-      readlnln(e.cultivos[e.dimL].tipo, e.cultivos[e.dimL].cantMeses);
-      readlnln(hectareas);
+      readln(e.cultivos[e.dimL].tipo, e.cultivos[e.dimL].cantMeses);
+      readln(hectareas);
     End;
 End;
 
 Procedure leerEmpresa(Var e: empresa);
 Begin
-  readlnln(e.codigo);
+  readln(e.codigo);
   If (e.codigo <> -1) Then
     Begin
-      readlnln(e.nombre, e.tipo, e.ciudad);
+      readln(e.nombre, e.tipo, e.ciudad);
       leerCultivos(e);
     End;
 End;
